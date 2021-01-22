@@ -1,0 +1,303 @@
+1.day1的目标
+	建立文件系统模块,可编入内核
+
+2.day1需要熟悉的api及数据结构
+	register_filesystem/unregister_filesystem
+		原理: 维护一个 struct file_system_type file_systems 结构体,该结构体中有一个链表
+			  第一次注册文件系统xxx时,会将 file_systems 填充 为xxx的信息
+	struct file_system_type
+		每次注册前填充了什么信息:
+			1.name
+			2.fs_flags
+			3.回调函数
+				mount
+					申请一个 super_block 结构体,并填充
+					每一个文件系统都实现了 mount
+					xxx_mount 一般流程
+						mount_nodev
+							sget 			// 申请结构体
+							xxx_fill_super  // 填充结构体
+(必须由实现具体文件系统的用户来填写)
+				kill_sb
+					将申请的 super_block 结构体 释放掉
+					实现可以 用 内核中已经有的 kill_super 函数 赋值
+
+					kill_sb 一般流程
+					一般被赋值为 kill_anon_super 或者 kill_litter_super 或者
+					kill_block_super
+			4.owner
+		注册的时候会填充秋天的信息
+
+
+	superblock 的 allocate 和 kill
+		samplefs_fill_super
+		kill_anon_super
+
+3.day1的状态
+	1.插入samplefs.ko的状态
+		$ cat /proc/filesystems   |grep samplefs
+	 	nodev   samplefs
+
+		// filesystems_proc_show
+		// 		seq_printf // 有多少个文件系统,就会调用多少次
+		//			seq_vprintf
+
+		// SyS_sendfile64
+		// 	do_sendfile
+		// 		do_splice_direct
+		// 			splice_direct_to_actor
+		// 				do_splice_to
+		// 					default_file_splice_read
+		// 						vfs_readv
+		// 							do_readv_writev
+		// 								proc_reg_read
+		// 									seq_read
+		// 										filesystems_proc_show
+
+	 	$ lsmod |grep samplefs
+		samplefs 822 0 - Live 0x7f01c000 (O)
+
+		$ ls /sys/module/samplefs/ -R
+		/sys/module/samplefs/:
+		coresize   initsize   notes      sections   uevent
+		holders    initstate  refcnt     taint
+
+		/sys/module/samplefs/holders:
+
+		/sys/module/samplefs/notes:
+
+		/sys/module/samplefs/sections:
+		__mcount_loc
+
+4.day1的应用状态 TODO
+	day1 实现的文件系统能mount吗?
+	day1 注册的 文件系统的回调函数是什么时候调用的
+
+
+5.linux-4.0 中的文件系统
+
+	linux-4.0 还会在其他(非 fs 目录)的地方创建文件系统吗?
+		会在 driver 中
+			dev_fs_type
+			drm_fs_type
+			ffs_fs_type
+			gadgetfs_type
+			ibmasmfs_type
+			ipathfs_fs_type
+			lustre_fs_type
+			oprofilefs_type
+			qibfs_fs_type
+			xenfs_type
+		会在 mm 中
+			shmem_fs_type   // 名字就是 tmpfs
+		会在 kernel 中
+			cgroup_fs_type
+			cpuset_fs_type
+		会在 arch 中
+		会在 init 中
+			rootfs_fs_type
+		会在 ipc 中
+			mqueue_fs_type
+		会在 net 中
+			sock_fs_type
+			rpc_pipe_fs_type
+		会在 security 中
+			fs_type
+			sel_fs_type
+			smk_fs_type
+
+
+	linux-4.0 fs 中 所有的 file_system_type 结构体
+		adfs_fs_type
+		affs_fs_type
+		afs_fs_type
+		aio_fs
+		anon_inode_fs_type
+		autofs_fs_type
+		bd_type
+		befs_fs_type
+		bfs_fs_type
+		bm_fs_type
+		btrfs_fs_type
+		ceph_fs_type
+		cifs_fs_type
+		coda_fs_type
+		configfs_fs_type
+		cramfs_fs_type
+		debug_fs_type
+		devpts_fs_type
+		dlmfs_fs_type
+		ecryptfs_fs_type
+		efivarfs_type
+		efs_fs_type
+		exofs_type
+		ext2_fs_type
+		ext3_fs_type
+		ext4_fs_type
+		f2fs_fs_type
+		fuseblk_fs_type
+		fuse_ctl_fs_type
+		fuse_fs_type
+		gfs2_fs_type
+		gfs2meta_fs_type
+		hfs_fs_type
+		hfsplus_fs_type
+		hostfs_type
+		hpfs_fs_type
+		hppfs_type
+		hugetlbfs_fs_type
+		iso9660_fs_type
+		jffs2_fs_type
+		jfs_fs_type
+		logfs_fs_type
+		minix_fs_type
+		msdos_fs_type
+		ncp_fs_type
+		nfs4_fs_type
+		nfs4_referral_fs_type
+		nfs4_remote_fs_type
+		nfs4_remote_referral_fs_type
+		nfsd_fs_type
+		nfs_fs_type
+		nfs_xdev_fs_type
+		nilfs_fs_type
+		nsfs
+		ntfs_fs_type
+		ocfs2_fs_type
+		omfs_fs_type
+		openprom_fs_type
+		ovl_fs_type
+		pipe_fs_type
+		proc_fs_type
+		pstore_fs_type
+		qnx4_fs_type
+		qnx6_fs_type
+		ramfs_fs_type
+		reiserfs_fs_type
+		romfs_fs_type
+		squashfs_fs_type
+		sysfs_fs_type
+		sysv_fs_type
+		test_type
+		ubifs_fs_type
+		udf_fstype
+		ufs_fs_type
+		v7_fs_type
+		v9fs_fs_type
+		vfat_fs_type
+		vxfs_fs_type
+		xfs_fs_type
+
+
+	linux-4.0 fs 中 所有的 kill_sb
+		affs_kill_sb
+		afs_kill_super
+		autofs4_kill_sb
+		btrfs_kill_super
+		ceph_kill_sb
+		cifs_kill_sb
+		cramfs_kill_sb
+		devpts_kill_sb
+		ecryptfs_kill_block_super
+		efivarfs_kill_sb
+		efs_kill_sb
+		fuse_ctl_kill_sb
+		fuse_kill_sb_anon
+		fuse_kill_sb_blk
+		generic_shutdown_super
+		gfs2_kill_sb
+		hostfs_kill_sb
+		kill_anon_super
+		kill_block_super
+		kill_f2fs_super
+		kill_litter_super
+		kill_ubifs_super
+		logfs_kill_sb
+		nfsd_umount
+		nfs_kill_super
+		proc_kill_sb
+		pstore_kill_sb
+		qnx4_kill_sb
+		ramfs_kill_sb
+		reiserfs_kill_sb
+		romfs_kill_sb
+		sysfs_kill_sb
+		v9fs_kill_super
+
+	linux-4.0 fs 中 所有的 mount
+		adfs_mount
+		affs_mount
+		afs_mount
+		aio_mount
+		anon_inodefs_mount
+		autofs_mount
+		bd_mount
+		befs_mount
+		bfs_mount
+		bm_mount
+		btrfs_mount
+		btrfs_test_mount
+		ceph_mount
+		cifs_do_mount
+		coda_mount
+		configfs_do_mount
+		cramfs_mount
+		devpts_mount
+		dlmfs_mount
+		ecryptfs_mount
+		efivarfs_mount
+		efs_mount
+		exofs_mount
+		ext2_mount
+		ext3_mount
+		ext4_mount
+		f2fs_mount
+		fuse_ctl_mount
+		fuse_mount
+		fuse_mount_blk
+		get_super_block
+		gfs2_mount
+		gfs2_mount_meta
+		hfs_mount
+		hfsplus_mount
+		hostfs_read_sb
+		hpfs_mount
+		hppfs_read_super
+		hugetlbfs_mount
+		isofs_mount
+		jfs_do_mount
+		logfs_mount
+		minix_mount
+		msdos_mount
+		ncp_mount
+		nfs4_referral_mount
+		nfs4_remote_mount
+		nfs4_remote_referral_mount
+		nfsd_mount
+		nfs_fs_mount
+		nfs_xdev_mount
+		nilfs_mount
+		nsfs_mount
+		ntfs_mount
+		ocfs2_mount
+		omfs_mount
+		openprom_mount
+		ovl_mount
+		pipefs_mount
+		proc_mount
+		pstore_mount
+		qnx4_mount
+		qnx6_mount
+		ramfs_mount
+		romfs_mount
+		squashfs_mount
+		sysfs_mount
+		sysv_mount
+		ubifs_mount
+		udf_mount
+		ufs_mount
+		v7_mount
+		v9fs_mount
+		vfat_mount
+		vxfs_mount
+		xfs_fs_mount
