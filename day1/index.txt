@@ -71,7 +71,57 @@
 
 4.day1的应用状态 TODO
 	day1 实现的文件系统能mount吗?
+		能,但是mount失败
+	# mount -t samplefs -o nodev /opt /dev/zero
+	Unable to handle kernel NULL pointer dereference at virtual address 0000005c
+	pgd = 9ebdc000
+	[0000005c] *pgd=7e236831, *pte=00000000, *ppte=00000000
+	Internal error: Oops: 17 [#2] SMP ARM
+	Modules linked in: samplefs(O) [last unloaded: samplefs]
+	CPU: 0 PID: 841 Comm: mount Tainted: G      D W  O    4.0.0 #15
+	Hardware name: ARM-Versatile Express
+	task: 9f544b00 ti: 9ee06000 task.ti: 9ee06000
+	PC is at mount_fs+0x30/0xb4
+	LR is at mount_nodev+0x54/0xac
+	pc : [<80119108>]    lr : [<80118398>]    psr: 000e0013
+	sp : 9ee07ec8  ip : 7f00c014  fp : 9ee07ef4
+	r10: 9e537b40  r9 : 9e5372c0  r8 : 7f00c0e8
+	r7 : 7f00c0e8  r6 : 00008000  r5 : 00000000  r4 : 7f00c01c
+	r3 : 40008000  r2 : 00000001  r1 : 00000000  r0 : 00000000
+	Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+	Control: 10c5387d  Table: 7ebdc059  DAC: 00000015
+	Process mount (pid: 841, stack limit = 0x9ee06210)
+	Stack: (0x9ee07ec8 to 0x9ee08000)
+	7ec0:                   80133d60 80059ff0 7f00c0e8 9f649480 9e5372c0
+	00008000
+	7ee0: 7f00c0e8 00000000 9ee07f1c 9ee07ef8 80133e04 801190e4 7f00c0e8
+	807c3ea4
+	7f00: 00000000 00000022 00008000 9e5372c0 9ee07f6c 9ee07f20 80136bbc
+	80133db8
+	7f20: 9ee07f6c 9ee07f30 9e4c1610 9f1b9bb0 00000000 9ee07f7c 80000000
+	00000000
+	7f40: 801368ec 9e537b40 9e5372c0 00000000 7e9d8f42 00008004 9ee06000
+	00000000
+	7f60: 9ee07fa4 9ee07f70 80137820 80136a24 00000000 00000000 600aac05
+	00000000
+	7f80: 00000400 00000000 00000000 7e9d8f3d 00000015 8000eda4 00000000
+	9ee07fa8
+	7fa0: 8000ec00 801377a8 00000000 00000000 7e9d8f3d 7e9d8f42 7e9d8f2b
+	00008004
+	7fc0: 00000000 00000000 7e9d8f3d 00000015 7e9d8f2b 00008004 00000005
+	00179a54
+	7fe0: 000000c3 7e9d8ae8 0006fc3b 00013108 400e0030 7e9d8f3d 00000000
+	00000000
+	[<80119108>] (mount_fs) from [<80133e04>] (vfs_kern_mount+0x58/0x110)
+	[<80133e04>] (vfs_kern_mount) from [<80136bbc>] (do_mount+0x1a4/0xa88)
+	[<80136bbc>] (do_mount) from [<80137820>] (SyS_mount+0x84/0xb0)
+	[<80137820>] (SyS_mount) from [<8000ec00>] (ret_fast_syscall+0x0/0x34)
+	Code: e12fff34 e3700a01 e1a05000 8a00000e (e590405c) 
+	---[ end trace 27f41a391ae586a1  ]---
+	Segmentation fault
 	day1 注册的 文件系统的回调函数是什么时候调用的
+		mount  命令执行的时候调用 mount   成员
+		umount 命令执行的时候调用 kill_sb 成员
 
 
 5.linux-4.0 中的文件系统
