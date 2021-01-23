@@ -1,0 +1,17 @@
+1.day3的目标
+	为了调试而增加以下支持
+		1. procfs
+		2. printk
+		3. module parms
+
+2.day3需要熟悉的api及数据结构
+	proc 相关,暂时不开展
+
+3.day3的状态
+	# cat /proc/fs/samplefs/debug_data
+	Display Debugging Information
+	-----------------------------
+	Day: 3
+
+4.day3的应用状态
+	mount umount 状态 和 day2 状态一样
