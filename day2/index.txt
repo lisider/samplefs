@@ -30,6 +30,20 @@
 	$ mount -t samplefs -o nodev /opt /dev/zero
 	$ mount
 	/opt on /dev/zero type samplefs (rw,nodev,relatime)
+	# stat -f /opt/
+	  File: "/opt/"
+	    ID: a261f47e369ee659 Namelen: 255     Type: ext2/ext3
+	Block size: 1024      
+	Blocks: Total: 144646     Free: 110900     Available: 100148
+	Inodes: Total: 38456      Free: 37935
+	# stat /opt/
+	  File: /opt/
+	  Size: 1024            Blocks: 2          IO Block: 1024   directory
+	Device: fe00h/65024d    Inode: 521         Links: 2
+	Access: (0755/drwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+	Access: 2021-01-22 13:57:12.000000000
+	Modify: 2021-01-22 10:42:13.000000000
+	Change: 2021-01-22 10:42:13.000000000
 	$ df /opt/
 	Filesystem           1K-blocks      Used Available Use% Mounted on
 	/dev/root               144646     33742    100152  25% /
