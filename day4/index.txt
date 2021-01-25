@@ -1,0 +1,91 @@
+1.day4的目标
+	将创建inode的任务,交给 samplefs
+	初始化inode结构体成员第一步
+
+2.day4需要熟悉的api及数据结构
+	struct inode
+	new_inode
+	init_special_inode
+
+3.day4的状态
+	# mount -t samplefs /dev/zero  /opt/
+	samplefs: fill super
+	samplefs: about to alloc root inode
+	no options
+	# mount
+	/dev/zero on /opt type samplefs (rw,relatime)
+
+	# stat -f /opt/
+	  File: "/opt/"
+	      ID: 0        Namelen: 255     Type: UNKNOWN
+	Block size: 4096
+	Blocks: Total: 0          Free: 0          Available: 0
+	Inodes: Total: 0          Free: 0
+
+	# stat /opt/
+	File: /opt/
+	Size: 0               Blocks: 0          IO Block: 4096   directory
+	Device: 11h/17d Inode: 0           Links: 2
+	Access: (0755/drwxr-xr-x)  Uid: (    0/    root )   Gid: (    0/
+	  	  root )
+	Access: 2021-01-23 11:27:49.000000000
+	Modify: 2021-01-23 11:27:49.000000000
+	Change: 2021-01-23 11:27:49.000000000
+
+	# df /opt/
+	Filesystem           1K-blocks      Used Available Use% Mounted on
+	/dev/zero                    0         0         0   0% /opt
+
+	# umount /opt/
+	# rmmod  samplefs
+	unloading samplefs
+
+4.day4的应用状态
+	mount umount 状态 和 day2/day3 状态不同
+	mount 具体用法待修正
+
+5.struct inode 结构体内容
+	day2中阐述了inode 在 哈希表中的图示
+	include/linux/fs.h 555 行 有定义
+	成员:
+		i_mode 				// 文件的类型和访问权限
+		i_uid 				// 文件拥有者标号
+		i_gid 				// 文件所在组标号
+		i_blocks 			// 文件所占块数
+		i_atime 			// 文件最后一次访问时间
+		i_mtime 			// 文件最后一次修改时间
+		i_ctime 			// inode最后一次修改时间
+		i_mapping 			// 表示向谁请求页面
+			a_ops
+			backing_dev_info
+		i_op 				// inode操作
+		i_fop 				// 文件操作
+	其他成员
+		https://cloud.tencent.com/developer/article/1053852
+6.创建一个inode一般用什么方法
+	iget_locked
+		// 这个方法 适用于 obtain an inode from a mounted file system
+	new_inode_pseudo
+	new_inode
+
+7.day4 文件操作状态
+	/opt/busybox/rootfs/work # insmod  samplefs.ko
+	init samplefs
+	/opt/busybox/rootfs/work # mount -t samplefs /dev/zero  /samplefs
+	samplefs: fill super
+	samplefs: about to alloc root inode
+	no options
+	/opt/busybox/rootfs/work # cd /samplefs/
+	/samplefs # ls
+	ls: can't open '.': No such device or address
+	/samplefs # touch 1
+	touch: 1: Permission denied
+	/samplefs # mkdir 1
+	mkdir: can't create directory '1': Operation not permitted
+	/samplefs # ls 1
+	ls: 1: No such file or directory
+	/samplefs # cd -
+	/opt/busybox/rootfs/work
+	/opt/busybox/rootfs/work # umount /samplefs
+	/opt/busybox/rootfs/work # rmmod samplefs
+	unloading samplefs
