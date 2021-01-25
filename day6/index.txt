@@ -1,0 +1,19 @@
+1.day6的目标
+	将创建inode的任务,交给 samplefs
+	初始化inode结构体成员第二步
+		i_op
+
+2.day6需要熟悉的api及数据结构
+	struct inode_operations
+
+6.struct dentry 结构体内容
+	dentry
+		d_op // dentry 的操作集合
+
+8.疑问
+	先创建私有数据,再创建inode结构体会出现问题
+
+9.TODO
+	sfs_dir_inode_ops 调用流程
+	sfs_mknod 函数实现
+

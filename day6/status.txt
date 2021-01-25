@@ -1,0 +1,154 @@
+/opt/busybox/rootfs/work # insmod samplefs.ko
+init samplefs
+/opt/busybox/rootfs/work # mount -t samplefs /dev/zero  /samplefs
+samplefs: fill super
+about to set inode ops
+directory inode sfs_sb: 9e52cf00
+samplefs: about to alloc root inode
+no options
+/opt/busybox/rootfs/work # mount
+/dev/root on / type ext4 (rw,relatime,data=ordered)
+proc on /proc type proc (rw,relatime)
+tmpfs on /tmp type tmpfs (rw,relatime)
+sysfs on /sys type sysfs (rw,relatime)
+tmpfs on /dev type tmpfs (rw,relatime)
+debugfs on /sys/kernel/debug type debugfs (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,mode=600)
+/dev/vdb on /mnt/Freeze type ext4 (rw,relatime,data=ordered)
+10.10.11.57:/home/suws/nfs4qemu on /opt type nfs (rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,nolock,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=10.10.11.57,mountvers=3,mountproto=tcp,local_lock=all,addr=10.10.11.57)
+/dev/zero on /samplefs type samplefs (rw,relatime)
+/opt/busybox/rootfs/work # stat -f /samplefs
+  File: "/samplefs"
+    ID: 0        Namelen: 255     Type: UNKNOWN
+Block size: 4096      
+Blocks: Total: 0          Free: 0          Available: 0
+Inodes: Total: 0          Free: 0
+/opt/busybox/rootfs/work # stat /samplefs
+  File: /samplefs
+  Size: 0               Blocks: 0          IO Block: 4096   directory
+Device: 11h/17d Inode: 0           Links: 2
+Access: (0755/drwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2021-01-25 09:20:31.000000000
+Modify: 2021-01-25 09:20:31.000000000
+Change: 2021-01-25 09:20:31.000000000
+
+/opt/busybox/rootfs/work # df /samplefs
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/zero                    0         0         0   0% /samplefs
+/opt/busybox/rootfs/work # cd /samplefs
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # rm file1 dir1 -rf
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # touch file1
+about to set inode ops
+file inode
+samplefs: mknod
+touch: file1: No such device or address
+/samplefs # mkdir dir1
+about to set inode ops
+directory inode sfs_sb: 9e52cf00
+samplefs: mknod
+/samplefs # mknod device_file c 5 1
+about to set inode ops
+samplefs: mknod
+/samplefs # ls -l device_file
+crw-r--r--    1 root     root        5,   1 Jan 25 09:20 device_file
+/samplefs #  ls file1
+file1
+/samplefs # ls dir1
+ls: can't open 'dir1': No such device or address
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # rm dir1 -rf
+/samplefs # ls dir1
+ls: can't open 'dir1': No such device or address
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # mv file1 file2
+/samplefs # ls file1
+ls: file1: No such file or directory
+/samplefs # ls file2
+file2
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # cd -
+/opt/busybox/rootfs/work
+/opt/busybox/rootfs/work # umount /samplefs
+BUG: Dentry 9f27e908{i=0,n=file2}  still in use (1) [unmount of samplefs samplefs]
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1593 at fs/dcache.c:1399 umount_check+0x90/0x94()
+Modules linked in: samplefs(O) [last unloaded: samplefs]
+CPU: 0 PID: 1593 Comm: umount Tainted: G      D W  O    4.0.0 #15
+Hardware name: ARM-Versatile Express
+[<80016ca4>] (unwind_backtrace) from [<80012bc8>] (show_stack+0x20/0x24)
+[<80012bc8>] (show_stack) from [<80542fb4>] (dump_stack+0x90/0xa0)
+[<80542fb4>] (dump_stack) from [<8002692c>] (warn_slowpath_common+0x94/0xc4)
+[<8002692c>] (warn_slowpath_common) from [<80026a18>] (warn_slowpath_null+0x2c/0x34)
+[<80026a18>] (warn_slowpath_null) from [<8012cc08>] (umount_check+0x90/0x94)
+[<8012cc08>] (umount_check) from [<80129ec4>] (d_walk+0xdc/0x318)
+[<80129ec4>] (d_walk) from [<8012c994>] (do_one_tree+0x34/0x48)
+[<8012c994>] (do_one_tree) from [<8012d1d4>] (shrink_dcache_for_umount+0x38/0x88)
+[<8012d1d4>] (shrink_dcache_for_umount) from [<80117304>] (generic_shutdown_super+0x2c/0x100)
+[<80117304>] (generic_shutdown_super) from [<80117674>] (kill_anon_super+0x1c/0x28)
+[<80117674>] (kill_anon_super) from [<80117a3c>] (deactivate_locked_super+0x68/0x8c)
+[<80117a3c>] (deactivate_locked_super) from [<80117f04>] (deactivate_super+0x68/0x6c)
+[<80117f04>] (deactivate_super) from [<80134280>] (cleanup_mnt+0x4c/0x90)
+[<80134280>] (cleanup_mnt) from [<80134338>] (__cleanup_mnt+0x1c/0x20)
+[<80134338>] (__cleanup_mnt) from [<800408e8>] (task_work_run+0xbc/0xf4)
+[<800408e8>] (task_work_run) from [<80012438>] (do_work_pending+0x90/0xb8)
+[<80012438>] (do_work_pending) from [<8000ec44>] (work_pending+0xc/0x20)
+---[ end trace bb15d410924f3dc6 ]---
+BUG: Dentry 9f27e550{i=0,n=device_file}  still in use (1) [unmount of samplefs samplefs]
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1593 at fs/dcache.c:1399 umount_check+0x90/0x94()
+Modules linked in: samplefs(O) [last unloaded: samplefs]
+CPU: 0 PID: 1593 Comm: umount Tainted: G      D W  O    4.0.0 #15
+Hardware name: ARM-Versatile Express
+[<80016ca4>] (unwind_backtrace) from [<80012bc8>] (show_stack+0x20/0x24)
+[<80012bc8>] (show_stack) from [<80542fb4>] (dump_stack+0x90/0xa0)
+[<80542fb4>] (dump_stack) from [<8002692c>] (warn_slowpath_common+0x94/0xc4)
+[<8002692c>] (warn_slowpath_common) from [<80026a18>] (warn_slowpath_null+0x2c/0x34)
+[<80026a18>] (warn_slowpath_null) from [<8012cc08>] (umount_check+0x90/0x94)
+[<8012cc08>] (umount_check) from [<80129ec4>] (d_walk+0xdc/0x318)
+[<80129ec4>] (d_walk) from [<8012c994>] (do_one_tree+0x34/0x48)
+[<8012c994>] (do_one_tree) from [<8012d1d4>] (shrink_dcache_for_umount+0x38/0x88)
+[<8012d1d4>] (shrink_dcache_for_umount) from [<80117304>] (generic_shutdown_super+0x2c/0x100)
+[<80117304>] (generic_shutdown_super) from [<80117674>] (kill_anon_super+0x1c/0x28)
+[<80117674>] (kill_anon_super) from [<80117a3c>] (deactivate_locked_super+0x68/0x8c)
+[<80117a3c>] (deactivate_locked_super) from [<80117f04>] (deactivate_super+0x68/0x6c)
+[<80117f04>] (deactivate_super) from [<80134280>] (cleanup_mnt+0x4c/0x90)
+[<80134280>] (cleanup_mnt) from [<80134338>] (__cleanup_mnt+0x1c/0x20)
+[<80134338>] (__cleanup_mnt) from [<800408e8>] (task_work_run+0xbc/0xf4)
+[<800408e8>] (task_work_run) from [<80012438>] (do_work_pending+0x90/0xb8)
+[<80012438>] (do_work_pending) from [<8000ec44>] (work_pending+0xc/0x20)
+---[ end trace bb15d410924f3dc7 ]---
+BUG: Dentry 9f2b6d48{i=0,n=dir1}  still in use (1) [unmount of samplefs samplefs]
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1593 at fs/dcache.c:1399 umount_check+0x90/0x94()
+Modules linked in: samplefs(O) [last unloaded: samplefs]
+CPU: 0 PID: 1593 Comm: umount Tainted: G      D W  O    4.0.0 #15
+Hardware name: ARM-Versatile Express
+[<80016ca4>] (unwind_backtrace) from [<80012bc8>] (show_stack+0x20/0x24)
+[<80012bc8>] (show_stack) from [<80542fb4>] (dump_stack+0x90/0xa0)
+[<80542fb4>] (dump_stack) from [<8002692c>] (warn_slowpath_common+0x94/0xc4)
+[<8002692c>] (warn_slowpath_common) from [<80026a18>] (warn_slowpath_null+0x2c/0x34)
+[<80026a18>] (warn_slowpath_null) from [<8012cc08>] (umount_check+0x90/0x94)
+[<8012cc08>] (umount_check) from [<80129ec4>] (d_walk+0xdc/0x318)
+[<80129ec4>] (d_walk) from [<8012c994>] (do_one_tree+0x34/0x48)
+[<8012c994>] (do_one_tree) from [<8012d1d4>] (shrink_dcache_for_umount+0x38/0x88)
+[<8012d1d4>] (shrink_dcache_for_umount) from [<80117304>] (generic_shutdown_super+0x2c/0x100)
+[<80117304>] (generic_shutdown_super) from [<80117674>] (kill_anon_super+0x1c/0x28)
+[<80117674>] (kill_anon_super) from [<80117a3c>] (deactivate_locked_super+0x68/0x8c)
+[<80117a3c>] (deactivate_locked_super) from [<80117f04>] (deactivate_super+0x68/0x6c)
+[<80117f04>] (deactivate_super) from [<80134280>] (cleanup_mnt+0x4c/0x90)
+[<80134280>] (cleanup_mnt) from [<80134338>] (__cleanup_mnt+0x1c/0x20)
+[<80134338>] (__cleanup_mnt) from [<800408e8>] (task_work_run+0xbc/0xf4)
+[<800408e8>] (task_work_run) from [<80012438>] (do_work_pending+0x90/0xb8)
+[<80012438>] (do_work_pending) from [<8000ec44>] (work_pending+0xc/0x20)
+---[ end trace bb15d410924f3dc8 ]---
+VFS: Busy inodes after unmount of samplefs. Self-destruct in 5 seconds.  Have a nice day...
+/opt/busybox/rootfs/work # rmmod samplefs
+unloading samplefs
+/opt/busybox/rootfs/work # rm samplefs.ko
