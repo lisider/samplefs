@@ -1,0 +1,57 @@
+/opt/busybox/rootfs/work # insmod samplefs.ko
+init samplefs
+/opt/busybox/rootfs/work # mount -t samplefs /dev/zero  /samplefs
+samplefs: fill super
+about to set inode ops
+directory inode sfs_sb: 9eb1a180
+samplefs: about to alloc root inode
+no options
+/opt/busybox/rootfs/work # mount
+/dev/root on / type ext4 (rw,relatime,data=ordered)
+proc on /proc type proc (rw,relatime)
+tmpfs on /tmp type tmpfs (rw,relatime)
+sysfs on /sys type sysfs (rw,relatime)
+tmpfs on /dev type tmpfs (rw,relatime)
+debugfs on /sys/kernel/debug type debugfs (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,mode=600)
+/dev/vdb on /mnt/Freeze type ext4 (rw,relatime,data=ordered)
+10.10.11.57:/home/suws/nfs4qemu on /opt type nfs (rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,nolock,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=10.10.11.57,mountvers=3,mountproto=tcp,local_lock=all,addr=10.10.11.57)
+/dev/zero on /samplefs type samplefs (rw,relatime)
+/opt/busybox/rootfs/work # stat -f /samplefs
+  File: "/samplefs"
+    ID: 0        Namelen: 255     Type: UNKNOWN
+Block size: 4096      
+Blocks: Total: 0          Free: 0          Available: 0
+Inodes: Total: 0          Free: 0
+/opt/busybox/rootfs/work # stat /samplefs
+  File: /samplefs
+  Size: 0               Blocks: 0          IO Block: 4096   directory
+Device: 11h/17d Inode: 0           Links: 2
+Access: (0755/drwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2021-01-25 06:33:20.000000000
+Modify: 2021-01-25 06:33:20.000000000
+Change: 2021-01-25 06:33:20.000000000
+
+/opt/busybox/rootfs/work # df /samplefs
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/zero                    0         0         0   0% /samplefs
+/opt/busybox/rootfs/work # cd /samplefs
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # rm file1 dir1 -rf
+/samplefs # ls
+ls: can't open '.': No such device or address
+/samplefs # touch file1
+touch: file1: Permission denied
+/samplefs # mkdir dir1
+mkdir: can't create directory 'dir1': Operation not permitted
+/samplefs # ls file1
+ls: file1: No such file or directory
+/samplefs # ls dir1
+ls: dir1: No such file or directory
+/samplefs # cd -
+/opt/busybox/rootfs/work
+/opt/busybox/rootfs/work # umount /samplefs
+/opt/busybox/rootfs/work # rmmod samplefs
+unloading samplefs
+/opt/busybox/rootfs/work # rm samplefs.ko
