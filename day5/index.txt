@@ -1,0 +1,34 @@
+1.day5的目标
+	将创建inode的任务,交给 samplefs
+	初始化inode结构体成员第二步
+		i_op
+
+2.day5需要熟悉的api及数据结构
+	struct inode_operations
+	struct dentry
+	struct dentry_operations
+
+3.day5的状态
+	在 status.txt 中
+
+
+5.struct inode_operations 结构体内容
+	inode_operations
+		lookup // 返回 dentry,查找索引节点所在的目录
+		create // 在某个目录下，为与dentry目录项相关的常规文件创建一个新的磁盘索引节点
+		mkdir  // 在某个目录下，为与目录项对应的目录创建一个新的索引节点
+		unlink // 从dir目录删除dentry目录项所指文件的硬链接
+		rmdir  // 从一个目录中删除子目录。子目录的名称包含在目录项对象中
+		mknod  // 在dir目录下，为与目录项对象相关的特殊文件创建一个新的磁盘索引节点。其中参数mode 和 rdev分别表示文件的类型和该设备的主码
+	其他介绍
+		https://www.cnblogs.com/youngerchina/archive/2011/12/14/5624647.html
+6.struct dentry 结构体内容
+	dentry
+		d_op // dentry 的操作集合
+7.struct dentry_operations 结构体内容
+	dentry_operations
+		d_hash 		// 用于VFS向哈希表中加入一个dentry
+		d_delete 	// 用于清除一个dentry
+
+8.疑问
+	先创建私有数据,再创建inode结构体会出现问题
